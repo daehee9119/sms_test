@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: sms-test
+  cloud:
+    aws:
+      region:
+        static: eu-central-1
+      sns:
+        enabled: true
+
+server:
+  port: ${PORT:8740}
+
+logging:
+  level:
+    root: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          health,info,metrics,prometheus
+
+---
+spring:
+  config:
+    activate:
+      on-cloud-platform: kubernetes
+  data:
+    redis:
+      cluster:
+        nodes: ${REDIS_HOST:localhost}:${REDIS_PORT:6379}
+---
+spring:
+  config:
+    activate:
+      on-profile: default
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}

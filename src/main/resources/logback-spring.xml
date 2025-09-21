@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- Stop output INFO at start -->
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
+
+    <springProperty scope="context" name="application_name" source="spring.application.name"/>
+
+    <variable name="logback_ecs_encoder" value="${LOG_ECS_FORMAT:-false}"/>
+
+    <property name="CONSOLE_LOG_PATTERN"
+              value="${CONSOLE_LOG_PATTERN:-%d{yyyy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } --- [%15.15t] %-40.40logger{39} [%X{logJob:-NA}] : %m%n}"/>
+
+    <appender name="STDOUT_DEFAULT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="STDOUT_ECS" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="co.elastic.logging.logback.EcsEncoder">
+            <serviceName>${application_name:-spring-boot-application}</serviceName>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <if condition='property("logback_ecs_encoder").contains("false")'>
+            <then>
+                <appender-ref ref="STDOUT_DEFAULT"/>
+            </then>
+            <else>
+                <appender-ref ref="STDOUT_ECS"/>
+            </else>
+        </if>
+    </root>
+</configuration>
